@@ -1,0 +1,182 @@
+=================================================================
+🌾 AGROSCAN AI - COMPLETE SETUP GUIDE
+=================================================================
+
+Follow these steps EXACTLY to get your app running:
+
+═══════════════════════════════════════════════════════════════
+STEP 1: SETUP SUPABASE DATABASE (5 minutes)
+═══════════════════════════════════════════════════════════════
+
+1. Open https://supabase.com/dashboard in your browser
+2. Click "New Project"
+   - Name: agroscan-ai
+   - Database Password: (create a strong password)
+   - Region: (choose closest to you)
+   - Click "Create new project" (wait 2 minutes)
+
+3. Once created, go to "SQL Editor" (left sidebar)
+4. Click "New Query"
+5. Copy the ENTIRE contents of supabase-schema.sql
+6. Paste it in the editor
+7. Click "Run" button
+8. You should see "Success. No rows returned"
+
+9. Go to "Settings" → "API" (left sidebar)
+10. Copy these TWO values:
+    ✓ Project URL: https://xxxxx.supabase.co
+    ✓ anon/public key: eyJhbGc... (long string)
+
+SAVE THESE - YOU'LL NEED THEM IN STEP 3!
+
+═══════════════════════════════════════════════════════════════
+STEP 2: GET CLAUDE API KEY (3 minutes)
+═══════════════════════════════════════════════════════════════
+
+1. Open https://console.anthropic.com/ in your browser
+2. Sign up or log in with Google/Email
+3. Click "Get API Keys" or "API Keys" in sidebar
+4. Click "+ Create Key"
+   - Name: agroscan-app
+   - Click "Create Key"
+5. COPY THE KEY IMMEDIATELY (starts with sk-ant-...)
+   ⚠️ WARNING: You can only see this ONCE!
+
+SAVE THIS KEY - YOU'LL NEED IT IN STEP 3!
+
+═══════════════════════════════════════════════════════════════
+STEP 3: SETUP YOUR PROJECT (5 minutes)
+═══════════════════════════════════════════════════════════════
+
+1. Open VS Code
+2. Open Terminal (Ctrl + ` or View → Terminal)
+3. Navigate to where you want the project:
+   cd Desktop
+   (or wherever you want)
+
+4. Create project folder:
+   mkdir agroscan-ai
+   cd agroscan-ai
+
+5. Copy ALL FILES from the "agroscan-complete" folder I gave you
+   into this new agroscan-ai folder
+
+6. In VS Code, open the agroscan-ai folder:
+   File → Open Folder → Select agroscan-ai
+
+7. You should see this structure:
+   agroscan-ai/
+   ├── src/
+   ├── package.json
+   ├── .env.example
+   └── ... (other files)
+
+8. Create .env file:
+   - Right-click in VS Code file explorer
+   - New File → name it: .env
+   - Copy contents from .env.example
+   - Replace with YOUR ACTUAL KEYS:
+
+   VITE_CLAUDE_API_KEY=sk-ant-your-actual-key-from-step-2
+   VITE_SUPABASE_URL=https://xxxxx.supabase.co  (from step 1)
+   VITE_SUPABASE_ANON_KEY=eyJhbGc...  (from step 1)
+
+   ⚠️ NO SPACES, NO QUOTES around the values!
+
+9. Save the .env file (Ctrl + S)
+
+═══════════════════════════════════════════════════════════════
+STEP 4: INSTALL & RUN (3 minutes)
+═══════════════════════════════════════════════════════════════
+
+1. In VS Code terminal, run:
+   npm install
+
+   (This will take 1-2 minutes, you'll see progress)
+
+2. Once finished, run:
+   npm run dev
+
+3. You should see:
+   VITE v5.x.x  ready in xxx ms
+   ➜  Local:   http://localhost:5173/
+
+4. Open http://localhost:5173 in your browser
+   (Ctrl + Click the link in terminal)
+
+5. YOU SHOULD SEE THE LOGIN SCREEN! 🎉
+
+═══════════════════════════════════════════════════════════════
+STEP 5: TEST THE APP (2 minutes)
+═══════════════════════════════════════════════════════════════
+
+1. Enter your name: "Test Farmer"
+2. Click "Start Scanning"
+3. Click the camera area to upload an image
+4. Upload ANY crop/plant image (tomato, rice, wheat, etc.)
+5. Click "Analyze Crop Health"
+6. Wait 5-10 seconds
+7. You should see results with:
+   ✓ Crop type
+   ✓ Health status
+   ✓ Disease (if any)
+   ✓ Treatment plan
+   ✓ Prevention tips
+
+8. Click "History" at bottom to see saved inspections
+9. SUCCESS! Your app is working! 🌾
+
+═══════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+❌ "Configuration Missing" error?
+   → Check .env file exists
+   → Verify all 3 keys are correct (no typos)
+   → Make sure keys have no spaces or quotes
+
+❌ "Analysis failed" error?
+   → Your Claude API key is wrong OR
+   → You have no credits (check console.anthropic.com)
+
+❌ "Database error"?
+   → Check Supabase URL is correct
+   → Verify you ran the SQL schema
+   → Make sure anon key is complete (very long)
+
+❌ App won't start?
+   → Delete node_modules folder
+   → Run: npm install again
+   → Run: npm run dev
+
+❌ Still having issues?
+   → Open browser console (F12)
+   → Look for red error messages
+   → Check the error and fix the specific issue
+
+═══════════════════════════════════════════════════════════════
+NEXT STEPS
+═══════════════════════════════════════════════════════════════
+
+✓ App works locally? Great!
+✓ Want to deploy online? You'll need:
+  - Backend API (to hide Claude key)
+  - Vercel/Netlify for hosting
+  - Domain name (optional)
+
+📱 For production use:
+   - Build: npm run build
+   - Test: npm run preview
+   - Deploy to your preferred platform
+
+⚠️ IMPORTANT FOR PRODUCTION:
+   Never expose Claude API key in frontend!
+   Move API calls to a backend server.
+
+═══════════════════════════════════════════════════════════════
+DONE! 🎉
+═══════════════════════════════════════════════════════════════
+
+You now have a fully working crop disease detection app!
+
+Need help? Check README.md for more details.
