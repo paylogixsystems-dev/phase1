@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Loader2, CheckCircle, AlertTriangle, XCircle, Upload, Leaf } from 'lucide-react';
+import { Camera, Loader2, CheckCircle, AlertTriangle, XCircle, Leaf } from 'lucide-react';
 import { analyzeCropImage } from '../services/claudeService';
 import { supabase } from '../services/supabaseClient';
 import { Inspection } from '../types';
@@ -72,6 +72,12 @@ const Scanner: React.FC<Props> = ({ userName, onAnalysisComplete }) => {
 
       if (dbError) throw dbError;
       if (!data) throw new Error('No data returned from database');
+
+      // Check if it was an invalid image
+      if (analysis.healthStatus === 'Unknown' || analysis.cropType === 'Invalid Image') {
+        setError(analysis.symptoms); // Show the rejection message
+        return;
+      }
 
       setResult(data);
       onAnalysisComplete(data);

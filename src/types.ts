@@ -4,7 +4,7 @@ export interface Inspection {
   user_name: string;
   crop_type: string;
   crop_type_tamil: string | null;
-  health_status: 'Healthy' | 'Stressed' | 'Diseased';
+  health_status: 'Healthy' | 'Stressed' | 'Diseased' | 'Unknown';
   disease_name: string | null;
   disease_name_tamil: string | null;
   confidence_score: number;

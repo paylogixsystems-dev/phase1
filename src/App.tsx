@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { LayoutDashboard, Camera, History as HistoryIcon, LogOut, User } from 'lucide-react';
+import { LayoutDashboard, Camera, History as HistoryIcon, LogOut } from 'lucide-react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Scanner from './components/Scanner';
@@ -126,15 +126,12 @@ function App() {
     localStorage.getItem('agroscan_user') || ''
   );
   const [inspections, setInspections] = useState<Inspection[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const isConfigured = isSupabaseConfigured && !!import.meta.env.VITE_CLAUDE_API_KEY;
+  const isConfigured = isSupabaseConfigured && !!(import.meta as any).env?.VITE_CLAUDE_API_KEY;
 
   useEffect(() => {
     if (isAuthenticated && supabase) {
       fetchInspections();
-    } else {
-      setLoading(false);
     }
   }, [isAuthenticated]);
 
@@ -151,8 +148,6 @@ function App() {
       setInspections(data || []);
     } catch (err) {
       console.error('Error fetching inspections:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -191,10 +186,6 @@ function App() {
     }
   };
 
-  const handleViewDetails = (inspection: Inspection) => {
-    // This is handled by the History component's modal
-  };
-
   if (!isConfigured) {
     return <ConfigError />;
   }
@@ -215,7 +206,6 @@ function App() {
                 <Dashboard 
                   inspections={inspections}
                   userName={userName}
-                  onViewDetails={handleViewDetails}
                 />
               } 
             />

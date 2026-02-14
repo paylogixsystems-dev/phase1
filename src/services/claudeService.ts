@@ -1,14 +1,14 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 const client = new Anthropic({
-  apiKey: import.meta.env.VITE_CLAUDE_API_KEY,
+  apiKey: (import.meta as any).env?.VITE_CLAUDE_API_KEY || '',
   dangerouslyAllowBrowser: true // Only for development - use backend in production
 });
 
 export interface CropAnalysis {
   cropType: string;
   cropTypeTamil: string;
-  healthStatus: 'Healthy' | 'Stressed' | 'Diseased';
+  healthStatus: 'Healthy' | 'Stressed' | 'Diseased' | 'Unknown';
   diseaseName: string | null;
   diseaseNameTamil: string | null;
   confidenceScore: number;
@@ -40,76 +40,71 @@ export const analyzeCropImage = async (base64Image: string): Promise<CropAnalysi
             },
             {
               type: 'text',
-              text: `You are an expert agricultural pathologist and crop disease specialist analyzing this crop image.
+              text: `CRITICAL FIRST TASK: VALIDATE IMAGE CONTENT
 
-CRITICAL ANALYSIS REQUIRED:
+STEP 1 - IMAGE VALIDATION (MANDATORY):
+Examine the image carefully. Is this a CROP or AGRICULTURAL PLANT?
 
-1. **IDENTIFY THE CROP TYPE**
-   - What specific crop is this? (rice, wheat, tomato, cotton, corn, etc.)
-   - Provide both English and Tamil names
+✅ VALID IMAGES (Continue to Step 2):
+- Crop plants: rice, wheat, corn, tomato, chili, cotton, sugarcane, etc.
+- Vegetable plants: cabbage, beans, lettuce, brinjal, etc.
+- Field crops: any plant grown by farmers for agriculture
+- Close-up of leaves, stems, fruits from farm crops
 
-2. **DETECT DISEASES/PROBLEMS**
-   - Look for: leaf spots, discoloration, wilting, holes, mold, pests, nutrient deficiency
-   - If disease detected: Name it specifically (e.g., "Late Blight", "Bacterial Leaf Spot", "Rice Blast")
-   - If healthy: State "No Disease Detected"
-   - Rate severity: Mild, Moderate, or Severe
+❌ INVALID IMAGES (Return error):
+- Cars, vehicles, machinery
+- People, animals, pets
+- Buildings, houses, infrastructure
+- Food items (cooked/processed)
+- Decorative flowers (roses, orchids - NOT farm crops)
+- Random objects, furniture, electronics
+- Blank/unclear images
 
-3. **HEALTH STATUS**
-   - Healthy: No visible problems
-   - Stressed: Early symptoms, nutrient issues, water stress
-   - Diseased: Active infection or pest damage
-
-4. **SYMPTOMS** (be specific)
-   - Describe what you see: color changes, patterns, location on plant
-   - Include size and spread of affected areas
-
-5. **TREATMENT** (actionable steps)
-   - If diseased: Recommend specific fungicides, pesticides, or organic treatments
-   - Include application rates and timing
-   - If healthy: Maintenance care only
-
-6. **PREVENTION** (future crop protection)
-   - Cultural practices to prevent recurrence
-   - Crop rotation, spacing, irrigation tips
+STEP 2 - IF VALID CROP IMAGE:
+Identify what crop this is:
+- Crop name in English
+- Crop name in Tamil
+- Set healthStatus to "Healthy" (for Phase 1, we're just identifying crops)
+- Set confidence based on image clarity
+- Simple description of what you see
 
 RESPONSE FORMAT (JSON):
+
+For VALID crop images:
 {
   "cropType": "Tomato",
   "cropTypeTamil": "தக்காளி",
-  "healthStatus": "Diseased",
-  "diseaseName": "Early Blight",
-  "diseaseNameTamil": "ஆரம்ப கருகல் நோய்",
-  "confidenceScore": 85,
-  "symptoms": "Circular brown spots with concentric rings on lower leaves, yellowing around spots",
-  "symptomsTamil": "கீழ் இலைகளில் வட்ட வடிவ பழுப்பு புள்ளிகள், புள்ளிகளைச் சுற்றி மஞ்சள் நிறம்",
-  "severity": "Moderate",
-  "treatment": [
-    "Apply Mancozeb fungicide (2g per liter) immediately",
-    "Remove and destroy heavily infected leaves",
-    "Spray every 7-10 days for 3 weeks",
-    "Ensure good air circulation between plants"
-  ],
-  "treatmentTamil": [
-    "உடனடியாக மான்கோசெப் பூஞ்சைக் கொல்லி (லிட்டருக்கு 2 கிராம்) தெளிக்கவும்",
-    "மோசமாக பாதிக்கப்பட்ட இலைகளை அகற்றி அழிக்கவும்",
-    "3 வாரங்களுக்கு ஒவ்வொரு 7-10 நாட்களுக்கும் தெளிக்கவும்",
-    "செடிகளுக்கு இடையே நல்ல காற்றோட்டம் உறுதி செய்யவும்"
-  ],
-  "prevention": [
-    "Practice crop rotation - don't plant tomatoes in same spot for 3 years",
-    "Water at soil level, avoid wetting leaves",
-    "Space plants 60cm apart for air flow",
-    "Apply mulch to prevent soil splash"
-  ],
-  "preventionTamil": [
-    "பயிர் சுழற்சி - 3 ஆண்டுகளுக்கு அதே இடத்தில் தக்காளி நடாதீர்கள்",
-    "மண் மட்டத்தில் நீர் பாய்ச்சவும், இலைகளை நனைக்க வேண்டாம்",
-    "காற்றோட்டத்திற்காக 60 செமீ இடைவெளியில் செடிகளை நடவும்",
-    "மண் தெறிப்பதைத் தடுக்க தழைக்கூளம் இடவும்"
-  ]
+  "healthStatus": "Healthy",
+  "diseaseName": null,
+  "diseaseNameTamil": null,
+  "confidenceScore": 90,
+  "symptoms": "Image shows tomato plant with green leaves",
+  "symptomsTamil": "படத்தில் பச்சை இலைகளுடன் தக்காளி செடி காட்டப்பட்டுள்ளது",
+  "severity": null,
+  "treatment": [],
+  "treatmentTamil": [],
+  "prevention": [],
+  "preventionTamil": []
 }
 
-Return ONLY valid JSON, no additional text. If the image is not a crop/plant, return healthStatus: "Unknown" and explain in symptoms.`,
+For INVALID (non-crop) images:
+{
+  "cropType": "Invalid Image",
+  "cropTypeTamil": "தவறான படம்",
+  "healthStatus": "Unknown",
+  "diseaseName": null,
+  "diseaseNameTamil": null,
+  "confidenceScore": 0,
+  "symptoms": "This image shows a [car/person/building/etc], not a crop. Please upload a photo of farm crops or plants.",
+  "symptomsTamil": "இந்த படம் ஒரு [விளக்கம்], பயிர் அல்ல. தயவுசெய்து பண்ணை பயிர்கள் அல்லது தாவரங்களின் புகைப்படத்தை பதிவேற்றவும்.",
+  "severity": null,
+  "treatment": [],
+  "treatmentTamil": [],
+  "prevention": [],
+  "preventionTamil": []
+}
+
+Return ONLY valid JSON, no additional text.`,
             },
           ],
         },

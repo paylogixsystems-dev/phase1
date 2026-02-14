@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Camera, CheckCircle, AlertTriangle, XCircle, TrendingUp, Calendar, Leaf } from 'lucide-react';
 import { Inspection } from '../types';
+import InspectionDetailModal from './InspectionDetailModal';
 
 interface Props {
   inspections: Inspection[];
   userName: string;
-  onViewDetails: (inspection: Inspection) => void;
 }
 
-const Dashboard: React.FC<Props> = ({ inspections, userName, onViewDetails }) => {
+const Dashboard: React.FC<Props> = ({ inspections, userName }) => {
+  const [selectedInspection, setSelectedInspection] = useState<Inspection | null>(null);
+  
   const totalScans = inspections.length;
   const healthyCount = inspections.filter(i => i.health_status === 'Healthy').length;
   const stressedCount = inspections.filter(i => i.health_status === 'Stressed').length;
@@ -46,6 +48,11 @@ const Dashboard: React.FC<Props> = ({ inspections, userName, onViewDetails }) =>
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-yellow-50 p-4 pb-24">
+      <InspectionDetailModal 
+        inspection={selectedInspection}
+        onClose={() => setSelectedInspection(null)}
+      />
+      
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Welcome Header */}
         <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-3xl p-6 text-white shadow-lg">
@@ -123,7 +130,7 @@ const Dashboard: React.FC<Props> = ({ inspections, userName, onViewDetails }) =>
               {recentScans.map((inspection) => (
                 <div
                   key={inspection.id}
-                  onClick={() => onViewDetails(inspection)}
+                  onClick={() => setSelectedInspection(inspection)}
                   className="flex items-center space-x-4 p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl cursor-pointer transition-all active:scale-98 border border-gray-200"
                 >
                   {/* Image */}
