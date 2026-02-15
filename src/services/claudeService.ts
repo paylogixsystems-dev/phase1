@@ -40,46 +40,56 @@ export const analyzeCropImage = async (base64Image: string): Promise<CropAnalysi
             },
             {
               type: 'text',
-              text: `CRITICAL FIRST TASK: VALIDATE IMAGE CONTENT
+              text: `You are an expert agricultural botanist specializing in Indian crop identification. Analyze this image with extreme precision.
 
-STEP 1 - IMAGE VALIDATION (MANDATORY):
-Examine the image carefully. Is this a CROP or AGRICULTURAL PLANT?
+CRITICAL INSTRUCTIONS:
 
-✅ VALID IMAGES (Continue to Step 2):
-- Crop plants: rice, wheat, corn, tomato, chili, cotton, sugarcane, etc.
-- Vegetable plants: cabbage, beans, lettuce, brinjal, etc.
-- Field crops: any plant grown by farmers for agriculture
-- Close-up of leaves, stems, fruits from farm crops
+STEP 1 - VALIDATE IMAGE TYPE:
+Is this an AGRICULTURAL CROP or VEGETABLE PLANT grown by farmers?
 
-❌ INVALID IMAGES (Return error):
-- Cars, vehicles, machinery
-- People, animals, pets
-- Buildings, houses, infrastructure
-- Food items (cooked/processed)
-- Decorative flowers (roses, orchids - NOT farm crops)
-- Random objects, furniture, electronics
-- Blank/unclear images
+✅ ACCEPT:
+- Vegetables: tomato, brinjal, chili, cabbage, beans, okra, cucumber, bottle gourd, bitter gourd, pumpkin, spinach, coriander
+- Grains: rice, wheat, corn, millet, sorghum
+- Cash crops: cotton, sugarcane, tobacco, groundnut, sunflower
+- Pulses: lentils, chickpeas, pigeon pea, green gram, black gram
+- Fruits: banana, papaya, guava, mango (tree leaves)
+- Plantation: tea, coffee, rubber
 
-STEP 2 - IF VALID CROP IMAGE:
-Identify what crop this is:
-- Crop name in English
-- Crop name in Tamil
-- Set healthStatus to "Healthy" (for Phase 1, we're just identifying crops)
-- Set confidence based on image clarity
-- Simple description of what you see
+❌ REJECT:
+- Cannabis/marijuana (NEVER identify as agricultural crop)
+- Ornamental plants (roses, tulips, orchids, indoor plants)
+- Wild plants, weeds
+- Non-plants (cars, people, buildings, food items)
 
-RESPONSE FORMAT (JSON):
+STEP 2 - CAREFUL IDENTIFICATION:
+Look at these features CAREFULLY:
+1. Leaf shape and arrangement (alternate, opposite, whorled)
+2. Leaf edges (smooth, serrated, lobed)
+3. Leaf texture (glossy, fuzzy, rough)
+4. Stem characteristics
+5. Visible fruits/flowers if any
+6. Growing context (pot, field, garden)
 
-For VALID crop images:
+Common misidentifications to AVOID:
+- Cannabis vs Hibiscus (both have palmate leaves)
+- Cannabis vs Cassava/Tapioca (both have finger-like leaves)
+- Cannabis vs certain squash/gourd plants
+- Young plants are harder - be conservative with confidence
+
+BE CONSERVATIVE: If unsure between multiple crops, choose the most common agricultural one in India, or lower confidence score.
+
+STEP 3 - RESPONSE FORMAT:
+
+For AGRICULTURAL CROPS:
 {
-  "cropType": "Tomato",
-  "cropTypeTamil": "தக்காளி",
+  "cropType": "Brinjal Plant" (or "Tomato", "Chili", etc.),
+  "cropTypeTamil": "கத்தரிக்காய்" (correct Tamil name),
   "healthStatus": "Healthy",
   "diseaseName": null,
   "diseaseNameTamil": null,
-  "confidenceScore": 90,
-  "symptoms": "Image shows tomato plant with green leaves",
-  "symptomsTamil": "படத்தில் பச்சை இலைகளுடன் தக்காளி செடி காட்டப்பட்டுள்ளது",
+  "confidenceScore": 85 (0-100, be realistic),
+  "symptoms": "Green leafy plant with broad leaves, appears to be a young brinjal/eggplant based on leaf shape and arrangement. Planted in pot.",
+  "symptomsTamil": "பரந்த இலைகளுடன் பச்சை இலை செடி, இலை வடிவம் மற்றும் அமைப்பின் அடிப்படையில் இளம் கத்தரிக்காய் போல் தெரிகிறது.",
   "severity": null,
   "treatment": [],
   "treatmentTamil": [],
@@ -87,7 +97,7 @@ For VALID crop images:
   "preventionTamil": []
 }
 
-For INVALID (non-crop) images:
+For NON-CROPS:
 {
   "cropType": "Invalid Image",
   "cropTypeTamil": "தவறான படம்",
@@ -95,8 +105,8 @@ For INVALID (non-crop) images:
   "diseaseName": null,
   "diseaseNameTamil": null,
   "confidenceScore": 0,
-  "symptoms": "This image shows a [car/person/building/etc], not a crop. Please upload a photo of farm crops or plants.",
-  "symptomsTamil": "இந்த படம் ஒரு [விளக்கம்], பயிர் அல்ல. தயவுசெய்து பண்ணை பயிர்கள் அல்லது தாவரங்களின் புகைப்படத்தை பதிவேற்றவும்.",
+  "symptoms": "This appears to be [describe what you see], which is not an agricultural crop. Please upload photos of farm-grown vegetables, grains, or cash crops.",
+  "symptomsTamil": "இது [விளக்கம்], இது ஒரு விவசாய பயிர் அல்ல. தயவுசெய்து பண்ணையில் வளர்க்கப்படும் காய்கறிகள், தானியங்கள் அல்லது பணப்பயிர்களின் புகைப்படங்களை பதிவேற்றவும்.",
   "severity": null,
   "treatment": [],
   "treatmentTamil": [],
@@ -104,7 +114,19 @@ For INVALID (non-crop) images:
   "preventionTamil": []
 }
 
-Return ONLY valid JSON, no additional text.`,
+IMPORTANT TAMIL CROP NAMES (use correct ones):
+- Tomato: தக்காளி
+- Brinjal/Eggplant: கத்தரிக்காய்
+- Chili: மிளகாய்
+- Okra: வெண்டைக்காய்
+- Bottle Gourd: சுரைக்காய்
+- Bitter Gourd: பாகற்காய்
+- Rice: நெல் / அரிசி
+- Wheat: கோதுமை
+- Corn: சோளம்
+- Cotton: பஞ்சு / பருத்தி
+
+Return ONLY valid JSON. No markdown, no explanation, just the JSON object.`,
             },
           ],
         },

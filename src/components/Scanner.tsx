@@ -20,13 +20,65 @@ const Scanner: React.FC<Props> = ({ userName, onAnalysisComplete }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Check if file is an image
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file');
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = () => {
-      setPreview(reader.result as string);
-      setResult(null);
-      setError(null);
+      const base64String = reader.result as string;
+      
+      // Compress large images (especially drone photos)
+      compressImage(base64String, (compressed) => {
+        setPreview(compressed);
+        setResult(null);
+        setError(null);
+      });
     };
     reader.readAsDataURL(file);
+  };
+
+  const compressImage = (base64: string, callback: (compressed: string) => void) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      
+      // Max dimensions - keeps quality good for AI analysis
+      const MAX_WIDTH = 1920;
+      const MAX_HEIGHT = 1920;
+      
+      let width = img.width;
+      let height = img.height;
+      
+      // Calculate new dimensions while maintaining aspect ratio
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      // Compress to JPEG with 85% quality (good for AI + smaller size)
+      const compressed = canvas.toDataURL('image/jpeg', 0.85);
+      callback(compressed);
+    };
+    img.onerror = () => {
+      // If image load fails, use original
+      callback(base64);
+    };
+    img.src = base64;
   };
 
   const analyzeImage = async () => {
