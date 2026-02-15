@@ -1,13 +1,19 @@
 {
-  "functions": {
-    "api/**/*": {
-      "maxDuration": 60
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:;"
+        }
+      ]
     }
   ]
 }
