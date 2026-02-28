@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Loader2, CheckCircle, AlertTriangle, XCircle, Leaf } from 'lucide-react';
+import { Camera, Loader2, CheckCircle, AlertTriangle, XCircle, Leaf, Upload } from 'lucide-react';
 import { analyzeCropImage } from '../services/claudeService';
 import { supabase } from '../services/supabaseClient';
 import { Inspection } from '../types';
@@ -15,6 +15,7 @@ const Scanner: React.FC<Props> = ({ userName, onAnalysisComplete }) => {
   const [result, setResult] = useState<Inspection | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -172,26 +173,63 @@ const Scanner: React.FC<Props> = ({ userName, onAnalysisComplete }) => {
 
       {/* Camera/Upload Section */}
       <div className="max-w-2xl mx-auto mb-6">
-        <div 
-          onClick={() => fileInputRef.current?.click()}
-          className="relative bg-white rounded-2xl shadow-lg overflow-hidden border-4 border-dashed border-green-300 hover:border-green-500 transition-all cursor-pointer"
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleFileChange}
-            className="hidden"
-          />
-          
-          {preview ? (
-            <img src={preview} alt="Crop" className="w-full h-80 object-cover" />
-          ) : (
-            <div className="h-80 flex flex-col items-center justify-center text-green-600">
-              <Camera className="w-16 h-16 mb-4" />
-              <p className="text-lg font-semibold">Tap to capture crop photo</p>
-              <p className="text-sm text-green-500 mt-2">Or upload from gallery</p>
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-green-200">
+          {/* Image Preview */}
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            className="relative border-4 border-dashed border-green-300 hover:border-green-500 transition-all cursor-pointer bg-gray-50"
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            
+            {preview ? (
+              <img src={preview} alt="Crop" className="w-full h-80 object-cover" />
+            ) : (
+              <div className="h-80 flex flex-col items-center justify-center text-green-600">
+                <Camera className="w-16 h-16 mb-4" />
+                <p className="text-lg font-semibold">Upload or Capture Photo</p>
+                <p className="text-sm text-green-500 mt-2">Tap to choose</p>
+              </div>
+            )}
+          </div>
+
+          {/* Camera and Gallery Buttons */}
+          {!preview && (
+            <div className="p-4 grid grid-cols-2 gap-3">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  cameraInputRef.current?.click();
+                }}
+                className="flex flex-col items-center justify-center py-4 bg-green-50 hover:bg-green-100 rounded-xl border-2 border-green-200 transition-all active:scale-95"
+              >
+                <Camera className="w-8 h-8 text-green-600 mb-2" />
+                <span className="text-sm font-semibold text-green-800">Open Camera</span>
+              </button>
+              
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
+                className="flex flex-col items-center justify-center py-4 bg-blue-50 hover:bg-blue-100 rounded-xl border-2 border-blue-200 transition-all active:scale-95"
+              >
+                <Upload className="w-8 h-8 text-blue-600 mb-2" />
+                <span className="text-sm font-semibold text-blue-800">Choose from Gallery</span>
+              </button>
             </div>
           )}
         </div>
