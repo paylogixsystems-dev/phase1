@@ -14,8 +14,8 @@ const Scanner: React.FC<Props> = ({ userName, onAnalysisComplete }) => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Inspection | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -167,41 +167,40 @@ const Scanner: React.FC<Props> = ({ userName, onAnalysisComplete }) => {
         <div className="inline-flex items-center justify-center w-16 h-16 bg-green-600 rounded-full mb-3 shadow-lg">
           <Leaf className="w-8 h-8 text-white" />
         </div>
-        <h1 className="text-3xl font-bold text-green-900 mb-2">Crop Health Scanner</h1>
-        <p className="text-green-700 text-sm">AI-powered disease detection for farmers</p>
+        <h1 className="text-3xl font-bold text-green-900 mb-2">Image Analyzer</h1>
+        <p className="text-green-700 text-sm">AI-powered identification in English & Tamil</p>
       </div>
 
       {/* Camera/Upload Section */}
       <div className="max-w-2xl mx-auto mb-6">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-green-200">
+          
+          {/* Hidden file inputs - TWO SEPARATE */}
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <input
+            ref={galleryInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+
           {/* Image Preview */}
-          <div 
-            onClick={() => fileInputRef.current?.click()}
-            className="relative border-4 border-dashed border-green-300 hover:border-green-500 transition-all cursor-pointer bg-gray-50"
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            
+          <div className="relative border-4 border-dashed border-green-300 bg-gray-50">
             {preview ? (
-              <img src={preview} alt="Crop" className="w-full h-80 object-cover" />
+              <img src={preview} alt="Preview" className="w-full h-80 object-cover" />
             ) : (
               <div className="h-80 flex flex-col items-center justify-center text-green-600">
                 <Camera className="w-16 h-16 mb-4" />
                 <p className="text-lg font-semibold">Upload or Capture Photo</p>
-                <p className="text-sm text-green-500 mt-2">Tap to choose</p>
+                <p className="text-sm text-green-500 mt-2">Choose option below</p>
               </div>
             )}
           </div>
@@ -209,26 +208,22 @@ const Scanner: React.FC<Props> = ({ userName, onAnalysisComplete }) => {
           {/* Camera and Gallery Buttons */}
           {!preview && (
             <div className="p-4 grid grid-cols-2 gap-3">
+              {/* CAMERA BUTTON */}
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  cameraInputRef.current?.click();
-                }}
+                onClick={() => cameraInputRef.current?.click()}
                 className="flex flex-col items-center justify-center py-4 bg-green-50 hover:bg-green-100 rounded-xl border-2 border-green-200 transition-all active:scale-95"
               >
                 <Camera className="w-8 h-8 text-green-600 mb-2" />
                 <span className="text-sm font-semibold text-green-800">Open Camera</span>
               </button>
               
+              {/* GALLERY BUTTON */}
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  fileInputRef.current?.click();
-                }}
+                onClick={() => galleryInputRef.current?.click()}
                 className="flex flex-col items-center justify-center py-4 bg-blue-50 hover:bg-blue-100 rounded-xl border-2 border-blue-200 transition-all active:scale-95"
               >
                 <Upload className="w-8 h-8 text-blue-600 mb-2" />
-                <span className="text-sm font-semibold text-blue-800">Choose from Gallery</span>
+                <span className="text-sm font-semibold text-blue-800">Choose Gallery</span>
               </button>
             </div>
           )}
@@ -249,27 +244,27 @@ const Scanner: React.FC<Props> = ({ userName, onAnalysisComplete }) => {
             ) : (
               <>
                 <Leaf className="w-6 h-6" />
-                <span>Analyze Crop Health</span>
+                <span>Analyze Image</span>
               </>
             )}
           </button>
         )}
-      </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="max-w-2xl mx-auto mb-6 bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-start space-x-3">
-          <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-red-800 text-sm">{error}</p>
-        </div>
-      )}
+        {/* Error Message */}
+        {error && (
+          <div className="mt-4 bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-start space-x-3">
+            <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+      </div>
 
       {/* Results */}
       {result && (
         <div className="max-w-2xl mx-auto space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {/* Crop Type */}
+          {/* Main Identification */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-600">
-            <p className="text-xs text-green-600 font-semibold mb-1 uppercase tracking-wider">Crop Identified</p>
+            <p className="text-xs text-green-600 font-semibold mb-1 uppercase tracking-wider">Identified As</p>
             <h2 className="text-2xl font-bold text-green-900">{result.crop_type}</h2>
             {result.crop_type_tamil && (
               <p className="text-lg text-green-700 font-medium mt-1">{result.crop_type_tamil}</p>
@@ -282,46 +277,39 @@ const Scanner: React.FC<Props> = ({ userName, onAnalysisComplete }) => {
             </div>
           </div>
 
-          {/* Health Status */}
-          <div className={`rounded-2xl shadow-lg p-6 border-2 ${getStatusColor(result.health_status)}`}>
-            <div className="flex items-center justify-between mb-4">
+          {/* Description */}
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h4 className="text-xs font-bold text-gray-400 uppercase mb-3">Description</h4>
+            <p className="text-gray-700 text-sm leading-relaxed mb-3">{result.symptoms}</p>
+            {result.symptoms_tamil && (
+              <p className="text-green-700 text-sm font-medium leading-relaxed italic border-t border-gray-100 pt-3">
+                {result.symptoms_tamil}
+              </p>
+            )}
+          </div>
+
+          {/* Health Status (if applicable) */}
+          {result.health_status !== 'Unknown' && (
+            <div className={`rounded-2xl shadow-lg p-6 border-2 ${getStatusColor(result.health_status)}`}>
               <div className="flex items-center space-x-3">
                 {getStatusIcon(result.health_status)}
                 <span className="text-lg font-bold">{result.health_status}</span>
               </div>
-              {result.severity && (
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/50">
-                  {result.severity}
-                </span>
+              {result.disease_name && (
+                <div className="mt-3 pt-3 border-t border-current/20">
+                  <p className="text-sm font-semibold">Disease: {result.disease_name}</p>
+                  {result.disease_name_tamil && (
+                    <p className="text-sm opacity-90 mt-1">{result.disease_name_tamil}</p>
+                  )}
+                </div>
               )}
             </div>
-            
-            {result.disease_name && (
-              <div className="mb-4">
-                <p className="text-sm font-semibold mb-1">Disease Detected:</p>
-                <p className="font-bold text-base">{result.disease_name}</p>
-                {result.disease_name_tamil && (
-                  <p className="text-sm font-medium opacity-90 mt-1">{result.disease_name_tamil}</p>
-                )}
-              </div>
-            )}
+          )}
 
-            <div>
-              <p className="text-sm font-semibold mb-2">Symptoms:</p>
-              <p className="text-sm leading-relaxed">{result.symptoms}</p>
-              {result.symptoms_tamil && (
-                <p className="text-sm leading-relaxed mt-2 opacity-90 italic">{result.symptoms_tamil}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Treatment */}
-          {result.treatment.length > 0 && (
+          {/* Treatment (if available) */}
+          {result.treatment && result.treatment.length > 0 && (
             <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-600">
-              <h3 className="text-lg font-bold text-blue-900 mb-4 flex items-center">
-                <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
-                Treatment Plan
-              </h3>
+              <h4 className="font-bold text-blue-900 mb-4">Treatment Plan</h4>
               <div className="space-y-3">
                 {result.treatment.map((step, i) => (
                   <div key={i} className="border-l-2 border-blue-200 pl-4">
@@ -335,13 +323,10 @@ const Scanner: React.FC<Props> = ({ userName, onAnalysisComplete }) => {
             </div>
           )}
 
-          {/* Prevention */}
-          {result.prevention.length > 0 && (
+          {/* Prevention (if available) */}
+          {result.prevention && result.prevention.length > 0 && (
             <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-purple-600">
-              <h3 className="text-lg font-bold text-purple-900 mb-4 flex items-center">
-                <span className="w-2 h-2 bg-purple-600 rounded-full mr-2"></span>
-                Prevention Tips
-              </h3>
+              <h4 className="font-bold text-purple-900 mb-4">Prevention Tips</h4>
               <div className="space-y-3">
                 {result.prevention.map((tip, i) => (
                   <div key={i} className="border-l-2 border-purple-200 pl-4">
